@@ -8,10 +8,13 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 use piston::window::WindowSettings;
+use piston::*;
 
 mod app;
+mod bird;
 mod draw;
-
+mod utils;
+// use crate::bird::Bird;
 use app::App;
 use draw::Drawable;
 
@@ -27,10 +30,14 @@ fn main() {
         .unwrap();
 
     // Create a new game and run it.
-    let mut app = App::instance(GlGraphics::new(opengl));
+    let mut app = App::new(GlGraphics::new(opengl));
 
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
+        if let Some(Button::Keyboard(key)) = e.press_args() {
+            app.key_pressed(key);
+        }
+
         if let Some(args) = e.render_args() {
             app.render(&args);
         }

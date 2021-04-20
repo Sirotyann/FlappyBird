@@ -1,8 +1,11 @@
 use opengl_graphics::GlGraphics;
 use piston::input::{RenderArgs, UpdateArgs};
+use piston::*;
 // use std::ops::Div;
 
+
 use crate::draw::Drawable;
+use crate::utils;
 
 pub struct App {
     pub gl: GlGraphics, // OpenGL drawing backend.
@@ -11,53 +14,59 @@ pub struct App {
 }
 
 impl App {
-    pub fn instance(gl: GlGraphics) -> App {
+    pub fn new(gl: GlGraphics) -> Self {
         App {
             gl: gl,
             distance: 0,
             score: 0,
         }
     }
-}
 
-fn rgb_to_color(r: u16, g: u16, b: u16, opacity: f32) -> [f32; 4] {
-    [
-        (r / 255) as f32,
-        (g / 255) as f32,
-        (b / 255) as f32,
-        opacity,
-    ]
+    pub fn key_pressed(&mut self, key: Key) {
+        let dir = match key {
+            Key::Up => Some("Up"),
+            Key::Down => Some("Down"),
+            _ => None,
+        };
+
+        println!("{:?} key", dir);
+    }
 }
 
 impl Drawable for App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
-        // let some_color = rgb_to_color(135, 243, 255, 1.0);
-       
-        // for color in &some_color {
-        //     print!("{:.32}", color)
-        // }
+        let green = utils::rgb_to_color(15, 125, 37, 1.0);
+        let blue = utils::rgb_to_color(135, 243, 255, 1.0);
+        let yellow = utils::rgb_to_color(255, 222, 5, 1.0);
 
-        let blue = [0.1, 0.5, 1.0, 1.0];
-        let red: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
+        let (earth_width, earth_height) = (window_width, window_height / 4.0);
+        let earth_square = [
+            0.0,
+            (window_height - earth_height),
+            window_width,
+            earth_height,
+        ];
 
-        let square = rectangle::square(0.0, 0.0, 50.0);
-        let rotation = 0.0;
-        let (x, y) = (args.window_size[0] / 2.0, args.window_size[1] / 2.0);
+        let bird_square = rectangle::square(20.0, (window_height / 2.0), 30.0);
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
             clear(blue, gl);
 
-            let transform = c
-                .transform
-                .trans(x, y)
-                .rot_rad(rotation)
-                .trans(-25.0, -25.0);
+            // let transform = c
+            //     .transform
+            //     .trans(x, y)
+            //     .rot_rad(rotation)
+            //     .trans(-25.0, -25.0);
+
+            rectangle(green, earth_square, c.transform, gl);
 
             // Draw a box rotating around the middle of the screen.
-            rectangle(red, square, transform, gl);
+            rectangle(yellow, bird_square, c.transform, gl);
+            
         });
     }
 
@@ -66,3 +75,4 @@ impl Drawable for App {
         // self.rotation += 2.0 * args.dt;
     }
 }
+
