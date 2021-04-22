@@ -30,20 +30,22 @@ fn main() {
         .unwrap();
 
     // Create a new game and run it.
-    let mut app = App::new(GlGraphics::new(opengl));
-
+    let mut app = App::new();
+    
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
+        let mut gl = GlGraphics::new(opengl);
+
         if let Some(Button::Keyboard(key)) = e.press_args() {
             app.key_pressed(key);
         }
 
         if let Some(args) = e.render_args() {
-            app.render(&args);
+            app.render(&mut gl, &args);
         }
 
-        if let Some(args) = e.update_args() {
-            app.update(&args);
-        }
+        // if let Some(args) = e.update_args() {
+        //     app.update(&args);
+        // }
     }
 }

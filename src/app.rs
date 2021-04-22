@@ -4,21 +4,24 @@ use piston::*;
 // use std::ops::Div;
 
 
+use crate::bird::Bird;
 use crate::draw::Drawable;
 use crate::utils;
 
 pub struct App {
-    pub gl: GlGraphics, // OpenGL drawing backend.
+    // pub gl: GlGraphics, // OpenGL drawing backend.
     distance: u32,
     score: u16,
+    // bird: Bird,
 }
 
 impl App {
-    pub fn new(gl: GlGraphics) -> Self {
+    pub fn new() -> Self {
         App {
-            gl: gl,
+            // gl: gl,
             distance: 0,
             score: 0,
+            // bird: Bird::new(),
         }
     }
 
@@ -31,10 +34,8 @@ impl App {
 
         println!("{:?} key", dir);
     }
-}
-
-impl Drawable for App {
-    fn render(&mut self, args: &RenderArgs) {
+    
+    pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
         use graphics::*;
 
         let green = utils::rgb_to_color(15, 125, 37, 1.0);
@@ -51,10 +52,11 @@ impl Drawable for App {
         ];
 
         let bird_square = rectangle::square(20.0, (window_height / 2.0), 30.0);
+        let mut bird = Bird::new();
 
-        self.gl.draw(args.viewport(), |c, gl| {
+        gl.draw(args.viewport(), |c, g| {
             // Clear the screen.
-            clear(blue, gl);
+            clear(blue, g);
 
             // let transform = c
             //     .transform
@@ -62,15 +64,19 @@ impl Drawable for App {
             //     .rot_rad(rotation)
             //     .trans(-25.0, -25.0);
 
-            rectangle(green, earth_square, c.transform, gl);
+            rectangle(green, earth_square, c.transform, g);
 
             // Draw a box rotating around the middle of the screen.
-            rectangle(yellow, bird_square, c.transform, gl);
+            // rectangle(yellow, bird_square, c.transform, g);
+
+            bird.render(window_width, window_height, &c, g);
             
         });
+
+       
     }
 
-    fn update(&mut self, args: &UpdateArgs) {
+    pub fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
         // self.rotation += 2.0 * args.dt;
     }
