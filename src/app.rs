@@ -6,8 +6,8 @@ use crate::bird::Bird;
 use crate::draw::Drawable;
 use crate::pipes::Pipes;
 
-use crate::basic::{get_sky_color, get_earth_color};
 use crate::basic::Direction;
+use crate::basic::{get_earth_color, get_sky_color};
 
 pub struct App {
     distance: u32,
@@ -63,5 +63,6 @@ impl App {
         // println!("App Update");
         // Rotate 2 radians per second.
         // self.rotation += 2.0 * args.dt;
+        self.pipes.move_forward();
     }
 }
