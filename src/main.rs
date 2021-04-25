@@ -11,10 +11,14 @@ use piston::window::WindowSettings;
 use piston::*;
 
 mod app;
+mod basic;
 mod bird;
 mod draw;
-mod utils;
+mod pipes;
+
 // use crate::bird::Bird;
+use crate::basic::SCREEN_HEIGHT;
+use crate::basic::SCREEN_WIDTH;
 use app::App;
 use draw::Drawable;
 
@@ -23,15 +27,16 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new("Flappy Bird", [512, 512])
+    let mut window: Window = WindowSettings::new("Flappy Bird", [SCREEN_WIDTH, SCREEN_HEIGHT])
         .graphics_api(opengl)
         .exit_on_esc(true)
+        .resizable(false)
         .build()
         .unwrap();
 
     // Create a new game and run it.
     let mut app = App::new();
-    
+
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         let mut gl = GlGraphics::new(opengl);
@@ -44,8 +49,9 @@ fn main() {
             app.render(&mut gl, &args);
         }
 
-        // if let Some(args) = e.update_args() {
-        //     app.update(&args);
-        // }
+        if let Some(args) = e.update_args() {
+            // println!("{:}?", args);
+            app.update(&args);
+        }
     }
 }

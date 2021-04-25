@@ -3,7 +3,13 @@ use piston::input::{RenderArgs, UpdateArgs};
 pub trait Drawable {
     // fn render(&mut self, args: &RenderArgs);
     // fn update(&mut self, args: &UpdateArgs);
-    fn draw(&mut self, con: &graphics::Context, g: &mut opengl_graphics::GlGraphics);
+    fn draw(
+        &mut self,
+        con: &graphics::Context,
+        g: &mut opengl_graphics::GlGraphics,
+        window_size: (f64, f64),
+    );
+    // fn draw(&mut self, con: &graphics::Context, g: &mut opengl_graphics::GlGraphics);
 }
 
 // pub trait

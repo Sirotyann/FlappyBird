@@ -1,16 +1,15 @@
-use crate::draw::Drawable;
-use crate::utils::rgb_to_color;
-use opengl_graphics::GlGraphics;
 use graphics::rectangle;
+use opengl_graphics::GlGraphics;
 use piston::input::{RenderArgs, UpdateArgs};
 
-use crate::utils;
-
-const BIRD_SIZE: f64 = 30.0;
+use crate::basic::rgb_to_color;
+use crate::basic::Direction;
+use crate::basic::BIRD_SIZE;
+use crate::draw::Drawable;
 
 pub struct Bird {
     color: [f32; 4],
-    offset_y: f32,
+    offset_y: f64,
 }
 
 impl Bird {
@@ -21,25 +20,41 @@ impl Bird {
         }
     }
 
-    pub fn render(&mut self, window_width: f64, window_height: f64, con: &graphics::Context, g: &mut opengl_graphics::GlGraphics) {
-        let y = (window_height - BIRD_SIZE) / 2.0 + (self.offset_y as f64);
-        let x = (window_width - BIRD_SIZE) / 2.0;
-        let square = [x, y, BIRD_SIZE, BIRD_SIZE];
-        rectangle(self.color, square, con.transform, g)
+    pub fn direction(&mut self, direction: Option<Direction>) {
+        match direction {
+            Some(Direction::Up) => {
+                println!("Move up");
+                self.offset_y = -50.0;
+            }
+            Some(Direction::Down) => {
+                println!("Move down");
+                self.offset_y = 50.0;
+            }
+            _ => {}
+        }
     }
 }
 
 impl Drawable for Bird {
-    fn draw(&mut self, con: &graphics::Context, g: &mut opengl_graphics::GlGraphics) {
-        
-        // let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
-        // let y = (window_height - BIRD_SIZE) / 2.0 + (self.offset_y as f64);
-        // let x = (window_width - BIRD_SIZE) / 2.0;
+    fn draw(
+        &mut self,
+        con: &graphics::Context,
+        g: &mut opengl_graphics::GlGraphics,
+        window_size: (f64, f64),
+    ) {
+        let (window_width, window_height) = window_size;
+        let y = (window_height - BIRD_SIZE) / 2.0 + self.offset_y as f64;
+        let x = (window_width - BIRD_SIZE) / 2.0;
+        let square = [x, y, BIRD_SIZE, BIRD_SIZE];
 
-        // let square = [x, y, BIRD_SIZE, BIRD_SIZE];
-        // // rectangle(self.color, square, c.transform, gl);
-        // self.gl.draw(args.viewport(), |c, gl| {
-        //     // rectangle(self.color, square, c.transform, gl);
-        // });
+        if self.offset_y != 0.0 {
+            self.offset_y = if self.offset_y.abs() < 1.0 {
+                0.0
+            } else {
+                self.offset_y / 2.0
+            };
+        }
+
+        rectangle(self.color, square, con.transform, g)
     }
 }

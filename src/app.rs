@@ -1,49 +1,46 @@
 use opengl_graphics::GlGraphics;
 use piston::input::{RenderArgs, UpdateArgs};
 use piston::*;
-// use std::ops::Div;
-
 
 use crate::bird::Bird;
 use crate::draw::Drawable;
-use crate::utils;
+use crate::pipes::Pipes;
+
+use crate::basic::{get_sky_color, get_earth_color};
+use crate::basic::Direction;
 
 pub struct App {
-    // pub gl: GlGraphics, // OpenGL drawing backend.
     distance: u32,
     score: u16,
-    // bird: Bird,
+    bird: Bird,
+    pipes: Pipes,
 }
 
 impl App {
     pub fn new() -> Self {
         App {
-            // gl: gl,
             distance: 0,
             score: 0,
-            // bird: Bird::new(),
+            bird: Bird::new(),
+            pipes: Pipes::new(),
         }
     }
 
     pub fn key_pressed(&mut self, key: Key) {
         let dir = match key {
-            Key::Up => Some("Up"),
-            Key::Down => Some("Down"),
+            Key::Up => Some(Direction::Up),
+            Key::Down => Some(Direction::Down),
             _ => None,
         };
-
-        println!("{:?} key", dir);
+        self.bird.direction(dir);
     }
-    
+
     pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
         use graphics::*;
 
-        let green = utils::rgb_to_color(15, 125, 37, 1.0);
-        let blue = utils::rgb_to_color(135, 243, 255, 1.0);
-        let yellow = utils::rgb_to_color(255, 222, 5, 1.0);
-
-        let (window_width, window_height) = (args.window_size[0], args.window_size[1]);
-        let (earth_width, earth_height) = (window_width, window_height / 4.0);
+        let window_size = (args.window_size[0], args.window_size[1]);
+        let (window_width, window_height) = window_size;
+        let (earth_width, earth_height) = (window_width, window_height / 8.0);
         let earth_square = [
             0.0,
             (window_height - earth_height),
@@ -55,30 +52,16 @@ impl App {
         let mut bird = Bird::new();
 
         gl.draw(args.viewport(), |c, g| {
-            // Clear the screen.
-            clear(blue, g);
-
-            // let transform = c
-            //     .transform
-            //     .trans(x, y)
-            //     .rot_rad(rotation)
-            //     .trans(-25.0, -25.0);
-
-            rectangle(green, earth_square, c.transform, g);
-
-            // Draw a box rotating around the middle of the screen.
-            // rectangle(yellow, bird_square, c.transform, g);
-
-            bird.render(window_width, window_height, &c, g);
-            
+            clear(get_sky_color(), g);
+            rectangle(get_earth_color(), earth_square, c.transform, g);
+            self.pipes.draw(&c, g, window_size);
+            self.bird.draw(&c, g, window_size);
         });
-
-       
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
+        // println!("App Update");
         // Rotate 2 radians per second.
         // self.rotation += 2.0 * args.dt;
     }
 }
-
