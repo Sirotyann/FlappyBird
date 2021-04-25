@@ -87,6 +87,24 @@ impl Pipes {
             None => {}
         }
     }
+
+    pub fn is_hit(&self, square: [f64; 4]) -> bool {
+        let [x, y, width, height] = square;
+        let square_edge_x = x + width;
+        let square_edge_y = y + height;
+        for pipe in self.pipes.iter() {
+            if (pipe.x + pipe.width) < x {
+                continue;
+            }
+            if pipe.x > square_edge_x {
+                break;
+            }
+            if y < pipe.y || square_edge_y > (pipe.y + PIPE_GAP_HEIGHT) {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 impl Drawable for Pipes {

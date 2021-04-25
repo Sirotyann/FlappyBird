@@ -34,6 +34,7 @@ pub const PIPE_GAP_WIDTH: f64 = 100.0;
 pub const PIPE_COLOR: [f32; 4] = [69.0, 130.0, 0.0, 1.0];
 pub const EARTH_COLOR: [f32; 4] = [222.0, 216.0, 139.0, 1.0];
 pub const SKY_COLOR: [f32; 4] = [78.0, 199.0, 207.0, 1.0];
+pub const ERROR_COLOR: [f32; 4] = [153.0, 0.0, 0.0, 0.7];
 
 pub fn get_pipe_color() -> [f32; 4] {
     rgbs_to_color(PIPE_COLOR)
@@ -45,4 +46,8 @@ pub fn get_earth_color() -> [f32; 4] {
 
 pub fn get_sky_color() -> [f32; 4] {
     rgbs_to_color(SKY_COLOR)
+}
+
+pub fn get_error_color() -> [f32; 4] {
+    rgbs_to_color(ERROR_COLOR)
 }

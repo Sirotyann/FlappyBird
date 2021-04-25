@@ -7,13 +7,14 @@ use crate::draw::Drawable;
 use crate::pipes::Pipes;
 
 use crate::basic::Direction;
-use crate::basic::{get_earth_color, get_sky_color};
+use crate::basic::{get_earth_color, get_error_color, get_sky_color};
 
 pub struct App {
     distance: u32,
     score: u16,
     bird: Bird,
     pipes: Pipes,
+    game_over: bool,
 }
 
 impl App {
@@ -23,6 +24,7 @@ impl App {
             score: 0,
             bird: Bird::new(),
             pipes: Pipes::new(),
+            game_over: false,
         }
     }
 
@@ -53,16 +55,34 @@ impl App {
 
         gl.draw(args.viewport(), |c, g| {
             clear(get_sky_color(), g);
+
             rectangle(get_earth_color(), earth_square, c.transform, g);
             self.pipes.draw(&c, g, window_size);
             self.bird.draw(&c, g, window_size);
+
+            if self.game_over {
+                rectangle(
+                    get_error_color(),
+                    [0.0, 0.0, window_width, window_height],
+                    c.transform,
+                    g,
+                );
+            }
         });
+
+        let bird_square = self.bird.get_square(window_size);
+        if self.pipes.is_hit(bird_square) {
+            println!("HIT!!");
+            self.game_over = true;
+        }
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
         // println!("App Update");
         // Rotate 2 radians per second.
         // self.rotation += 2.0 * args.dt;
-        self.pipes.move_forward();
+        if self.game_over == false {
+            self.pipes.move_forward();
+        }
     }
 }

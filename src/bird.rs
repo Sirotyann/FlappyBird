@@ -33,6 +33,13 @@ impl Bird {
             _ => {}
         }
     }
+
+    pub fn get_square(&self, window_size: (f64, f64)) -> [f64; 4] {
+        let (window_width, window_height) = window_size;
+        let y = (window_height - BIRD_SIZE) / 2.0 + self.offset_y as f64;
+        let x = (window_width - BIRD_SIZE) / 2.0;
+        [x, y, BIRD_SIZE, BIRD_SIZE]
+    }
 }
 
 impl Drawable for Bird {
@@ -42,10 +49,7 @@ impl Drawable for Bird {
         g: &mut opengl_graphics::GlGraphics,
         window_size: (f64, f64),
     ) {
-        let (window_width, window_height) = window_size;
-        let y = (window_height - BIRD_SIZE) / 2.0 + self.offset_y as f64;
-        let x = (window_width - BIRD_SIZE) / 2.0;
-        let square = [x, y, BIRD_SIZE, BIRD_SIZE];
+        let square = self.get_square(window_size);
 
         if self.offset_y != 0.0 {
             self.offset_y = if self.offset_y.abs() < 1.0 {
