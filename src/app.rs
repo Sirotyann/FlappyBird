@@ -1,6 +1,7 @@
 use opengl_graphics::GlGraphics;
 use piston::input::{RenderArgs, UpdateArgs};
 use piston::*;
+use std::process;
 
 use crate::bird::Bird;
 use crate::draw::Drawable;
@@ -10,8 +11,6 @@ use crate::basic::Direction;
 use crate::basic::{get_earth_color, get_error_color, get_sky_color};
 
 pub struct App {
-    distance: u32,
-    score: u16,
     bird: Bird,
     pipes: Pipes,
     game_over: bool,
@@ -20,8 +19,6 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            distance: 0,
-            score: 0,
             bird: Bird::new(),
             pipes: Pipes::new(),
             game_over: false,
@@ -50,15 +47,23 @@ impl App {
             earth_height,
         ];
 
-        let bird_square = rectangle::square(20.0, (window_height / 2.0), 30.0);
-        let mut bird = Bird::new();
-
         gl.draw(args.viewport(), |c, g| {
             clear(get_sky_color(), g);
+
+            //辅助线
+            // rectangle(get_earth_color(), [0.0, 195.0, window_width, 1.0], c.transform, g);
+            // rectangle(get_error_color(), [0.0, 211.0, window_width, 1.0], c.transform, g);
 
             rectangle(get_earth_color(), earth_square, c.transform, g);
             self.pipes.draw(&c, g, window_size);
             self.bird.draw(&c, g, window_size);
+
+            let bird_square = self.bird.get_square(window_size);
+            if self.pipes.is_hit(bird_square) {
+                println!("HIT!!");
+                self.game_over = true;
+                // process::exit(1);
+            }
 
             if self.game_over {
                 rectangle(
@@ -68,21 +73,13 @@ impl App {
                     g,
                 );
             }
-        });
-
-        let bird_square = self.bird.get_square(window_size);
-        if self.pipes.is_hit(bird_square) {
-            println!("HIT!!");
-            self.game_over = true;
-        }
+        });       
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        // println!("App Update");
-        // Rotate 2 radians per second.
-        // self.rotation += 2.0 * args.dt;
         if self.game_over == false {
             self.pipes.move_forward();
+            self.bird.g_move();
         }
     }
 }

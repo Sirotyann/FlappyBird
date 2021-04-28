@@ -5,21 +5,24 @@ use rand::{thread_rng, Rng};
 use std::collections::LinkedList;
 
 use crate::basic::{
-    get_pipe_color, Direction, PIPE_GAP_HEIGHT, PIPE_GAP_WIDTH, PIPE_HEIGHT_MAX, PIPE_HEIGHT_MIN,
-    PIPE_WIDTH_MAX, PIPE_WIDTH_MIN, SCREEN_HEIGHT, SCREEN_WIDTH,
+    get_bird_square, get_pipe_color, Direction, PIPE_GAP_HEIGHT, PIPE_GAP_WIDTH, PIPE_HEIGHT_MAX,
+    PIPE_HEIGHT_MIN, PIPE_WIDTH_MAX, PIPE_WIDTH_MIN, SCREEN_HEIGHT, SCREEN_WIDTH,
 };
 use crate::draw::Drawable;
 
+#[derive(Copy, Clone)]
 pub struct Pipe {
     width: f64,
     x: f64,
     y: f64,
+    id: u32,
 }
 
 pub struct Pipes {
     color: [f32; 4],
     pipes: LinkedList<Pipe>,
     offset_x: f64,
+    hittable_pipe: Option<Pipe>,
 }
 
 impl Pipe {
@@ -42,6 +45,7 @@ impl Pipes {
             color: get_pipe_color(),
             pipes: Pipes::generate_pipes(),
             offset_x: 8.0,
+            hittable_pipe: None,
         }
     }
 
@@ -49,20 +53,24 @@ impl Pipes {
         // let mut rng = thread_rng();
         let mut x: f64 = SCREEN_WIDTH;
         let mut list = LinkedList::new();
+        let mut index = 1;
         while x < SCREEN_WIDTH * 3.0 {
-            let pipe = Pipes::generate_pipe(x);
+            let pipe = Pipes::generate_pipe(x, index);
             x = x + pipe.width + PIPE_GAP_WIDTH;
             list.push_back(pipe);
+            index += 1;
         }
         list
     }
 
-    fn generate_pipe(x: f64) -> Pipe {
+    fn generate_pipe(x: f64, index: u32) -> Pipe {
         let mut rng = thread_rng();
         Pipe {
             width: PIPE_WIDTH_MIN,
             x: x,
+            // y: 200.0,
             y: rng.gen_range((PIPE_HEIGHT_MIN..PIPE_HEIGHT_MAX)),
+            id: index,
         }
     }
 
@@ -74,36 +82,45 @@ impl Pipes {
     }
 
     pub fn move_forward(&mut self) {
+        let [bird_x, bird_y, bird_width, bird_heigth] = get_bird_square();
+
         for pipe in self.pipes.iter_mut() {
             pipe.move_forward(self.offset_x);
-        }
-        let first = self.pipes.front();
-        match first {
-            Some(p) => {
-                if p.x + p.width < 0.0 {
-                    self.move_offscreen_item();
-                }
+
+            if pipe.x <= (bird_x + bird_width) && (pipe.x + pipe.width) >= bird_x {
+                self.hittable_pipe = Some(*pipe);
             }
-            None => {}
         }
+
+        let first = self.pipes.front().unwrap();
+        if first.x + first.width < 0.0 {
+            self.move_offscreen_item();
+        }
+
+        // match first {
+        //     Some(p) => {
+        //         if p.x + p.width < 0.0 {
+        //             self.move_offscreen_item();
+        //         }
+        //         let [bird_x, bird_y, bird_width, bird_heigth] = get_bird_square();
+        //         if p.x <= (bird_x + bird_width) && (p.x + p.width) >= bird_x {
+        //             // self.hittable_pipe = Some(*p);
+        //             self.set_hittable_pipe(*p);
+        //         }
+        //     }
+        //     None => {}
+        // }
     }
 
     pub fn is_hit(&self, square: [f64; 4]) -> bool {
         let [x, y, width, height] = square;
-        let square_edge_x = x + width;
-        let square_edge_y = y + height;
-        for pipe in self.pipes.iter() {
-            if (pipe.x + pipe.width) < x {
-                continue;
-            }
-            if pipe.x > square_edge_x {
-                break;
-            }
-            if y < pipe.y || square_edge_y > (pipe.y + PIPE_GAP_HEIGHT) {
-                return true;
-            }
+        match self.hittable_pipe {
+            Some(pipe) => {
+                println!("<<<< is hit <<< {:?}, {:?}", (y, pipe.y), (y + height, pipe.y + PIPE_GAP_WIDTH));
+                y <= pipe.y || y + height > (pipe.y + PIPE_GAP_WIDTH)
+            },
+            None => false,
         }
-        false
     }
 }
 
@@ -118,6 +135,7 @@ impl Drawable for Pipes {
         for pipe in self.pipes.iter_mut() {
             rectangle(self.color, pipe.top_square(), con.transform, g);
             rectangle(self.color, pipe.bottom_square(), con.transform, g);
+            println!("Pipe {}  top: {:?}  bottom: {:?}", pipe.id, pipe.top_square(), pipe.bottom_square());
         }
     }
 }

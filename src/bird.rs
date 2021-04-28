@@ -12,6 +12,8 @@ pub struct Bird {
     offset_y: f64,
 }
 
+const G:f64 = 10.0;
+
 impl Bird {
     pub fn new() -> Self {
         Bird {
@@ -40,6 +42,16 @@ impl Bird {
         let x = (window_width - BIRD_SIZE) / 2.0;
         [x, y, BIRD_SIZE, BIRD_SIZE]
     }
+
+    pub fn g_move(&mut self) {
+        if self.offset_y != 0.0 {
+            self.offset_y = if self.offset_y.abs() < 1.0 {
+                0.0
+            } else {
+                self.offset_y / 2.0
+            };
+        }
+    }
 }
 
 impl Drawable for Bird {
@@ -50,15 +62,7 @@ impl Drawable for Bird {
         window_size: (f64, f64),
     ) {
         let square = self.get_square(window_size);
-
-        if self.offset_y != 0.0 {
-            self.offset_y = if self.offset_y.abs() < 1.0 {
-                0.0
-            } else {
-                self.offset_y / 2.0
-            };
-        }
-
+        println!("Draw bird {:?}", square);
         rectangle(self.color, square, con.transform, g)
     }
 }

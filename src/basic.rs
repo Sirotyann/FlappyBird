@@ -51,3 +51,12 @@ pub fn get_sky_color() -> [f32; 4] {
 pub fn get_error_color() -> [f32; 4] {
     rgbs_to_color(ERROR_COLOR)
 }
+
+pub fn get_bird_square() -> [f64; 4] {
+    [
+        (SCREEN_WIDTH - BIRD_SIZE) / 2.0,
+        (SCREEN_HEIGHT - BIRD_SIZE) / 2.0,
+        BIRD_SIZE,
+        BIRD_SIZE,
+    ]
+}
