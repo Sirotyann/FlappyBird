@@ -50,7 +50,6 @@ fn main() {
         }
 
         if let Some(args) = e.update_args() {
-            // println!("{:}?", args);
             app.update(&args);
         }
     }

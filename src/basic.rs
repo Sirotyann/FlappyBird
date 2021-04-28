@@ -28,7 +28,7 @@ pub const PIPE_WIDTH_MAX: f64 = 100.0;
 pub const PIPE_WIDTH_MIN: f64 = 80.0;
 pub const PIPE_HEIGHT_MAX: f64 = 252.0;
 pub const PIPE_HEIGHT_MIN: f64 = 140.0;
-pub const PIPE_GAP_HEIGHT: f64 = 100.0;
+pub const PIPE_GAP_HEIGHT: f64 = 120.0;
 pub const PIPE_GAP_WIDTH: f64 = 100.0;
 
 pub const PIPE_COLOR: [f32; 4] = [69.0, 130.0, 0.0, 1.0];

@@ -34,6 +34,10 @@ impl App {
         self.bird.direction(dir);
     }
 
+    pub fn bird_jump(&mut self) {
+        self.bird.direction(Some(Direction::Up));
+    }
+
     pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
         use graphics::*;
 
@@ -60,7 +64,7 @@ impl App {
 
             let bird_square = self.bird.get_square(window_size);
             if self.pipes.is_hit(bird_square) {
-                println!("HIT!!");
+                // println!("HIT!!  bird: {:?}", bird_square);
                 self.game_over = true;
                 // process::exit(1);
             }
@@ -73,7 +77,7 @@ impl App {
                     g,
                 );
             }
-        });       
+        });
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {

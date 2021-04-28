@@ -50,7 +50,6 @@ impl Pipes {
     }
 
     fn generate_pipes() -> LinkedList<Pipe> {
-        // let mut rng = thread_rng();
         let mut x: f64 = SCREEN_WIDTH;
         let mut list = LinkedList::new();
         let mut index = 1;
@@ -84,6 +83,7 @@ impl Pipes {
     pub fn move_forward(&mut self) {
         let [bird_x, bird_y, bird_width, bird_heigth] = get_bird_square();
 
+        self.hittable_pipe = None;
         for pipe in self.pipes.iter_mut() {
             pipe.move_forward(self.offset_x);
 
@@ -96,29 +96,26 @@ impl Pipes {
         if first.x + first.width < 0.0 {
             self.move_offscreen_item();
         }
-
-        // match first {
-        //     Some(p) => {
-        //         if p.x + p.width < 0.0 {
-        //             self.move_offscreen_item();
-        //         }
-        //         let [bird_x, bird_y, bird_width, bird_heigth] = get_bird_square();
-        //         if p.x <= (bird_x + bird_width) && (p.x + p.width) >= bird_x {
-        //             // self.hittable_pipe = Some(*p);
-        //             self.set_hittable_pipe(*p);
-        //         }
-        //     }
-        //     None => {}
-        // }
     }
 
     pub fn is_hit(&self, square: [f64; 4]) -> bool {
         let [x, y, width, height] = square;
+        if y > SCREEN_HEIGHT {
+            return true;
+        }
         match self.hittable_pipe {
             Some(pipe) => {
-                println!("<<<< is hit <<< {:?}, {:?}", (y, pipe.y), (y + height, pipe.y + PIPE_GAP_WIDTH));
-                y <= pipe.y || y + height > (pipe.y + PIPE_GAP_WIDTH)
-            },
+                // let result = (y <= pipe.y || y + height > (pipe.y + PIPE_GAP_HEIGHT));
+                // println!(
+                //     "<<<< is hit {} <<< {} <= {} || {} > {}",
+                //     result,
+                //     y,
+                //     pipe.y,
+                //     (y + height),
+                //     (pipe.y + PIPE_GAP_WIDTH)
+                // );
+                y <= pipe.y || y + height > (pipe.y + PIPE_GAP_HEIGHT)
+            }
             None => false,
         }
     }
@@ -135,7 +132,12 @@ impl Drawable for Pipes {
         for pipe in self.pipes.iter_mut() {
             rectangle(self.color, pipe.top_square(), con.transform, g);
             rectangle(self.color, pipe.bottom_square(), con.transform, g);
-            println!("Pipe {}  top: {:?}  bottom: {:?}", pipe.id, pipe.top_square(), pipe.bottom_square());
+            // println!(
+            //     "Pipe {}  top: {:?}  bottom: {:?}",
+            //     pipe.id,
+            //     pipe.top_square(),
+            //     pipe.bottom_square()
+            // );
         }
     }
 }
