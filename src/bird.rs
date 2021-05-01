@@ -1,12 +1,8 @@
 use graphics::rectangle;
-use opengl_graphics::GlGraphics;
-use piston::input::{RenderArgs, UpdateArgs};
-
-use crate::basic::rgb_to_color;
-use crate::basic::Direction;
-use crate::basic::BIRD_SIZE;
+use crate::basic::{rgb_to_color, Direction, BIRD_SIZE, SCREEN_SIZE};
 use crate::draw::Drawable;
 
+#[derive(Debug)]
 pub struct Bird {
     color: [f32; 4],
     offset_y: f64,
@@ -29,22 +25,18 @@ impl Bird {
     pub fn direction(&mut self, direction: Option<Direction>) {
         match direction {
             Some(Direction::Up) => {
-                // self.up_speed = 2.5 * GA;
                 self.offset_y -= 50.0;
                 self.g_speed = 0.0;
-                // println!("Move up  {}", self.g_speed);
             }
             Some(Direction::Down) => {
-                // println!("Move down");
-                // self.offset_y = 50.0;
-                self.g_speed += (GA / 4.0);
+                self.g_speed += GA / 4.0;
             }
             _ => {}
         }
     }
 
-    pub fn get_square(&self, window_size: (f64, f64)) -> [f64; 4] {
-        let (window_width, window_height) = window_size;
+    pub fn get_square(&self) -> [f64; 4] {
+        let (window_width, window_height) = SCREEN_SIZE;
         let y = (window_height - BIRD_SIZE) / 2.0 + self.offset_y as f64;
         let x = (window_width - BIRD_SIZE) / 2.0;
         [x, y, BIRD_SIZE, BIRD_SIZE]
@@ -59,13 +51,6 @@ impl Bird {
         } else {
             self.up_speed / 2.0
         };
-        // if self.offset_y != 0.0 {
-        //     self.offset_y = if self.offset_y.abs() < 1.0 {
-        //         0.0
-        //     } else {
-        //         self.offset_y / 2.0
-        //     };
-        // }
     }
 }
 
@@ -74,10 +59,8 @@ impl Drawable for Bird {
         &mut self,
         con: &graphics::Context,
         g: &mut opengl_graphics::GlGraphics,
-        window_size: (f64, f64),
     ) {
-        let square = self.get_square(window_size);
-        // println!("Draw bird {:?}", square);
+        let square = self.get_square();
         rectangle(self.color, square, con.transform, g)
     }
 }

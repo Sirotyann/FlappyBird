@@ -1,7 +1,6 @@
 use opengl_graphics::GlGraphics;
 use piston::input::{RenderArgs, UpdateArgs};
 use piston::*;
-use std::process;
 
 use crate::bird::Bird;
 use crate::draw::Drawable;
@@ -10,15 +9,15 @@ use crate::pipes::Pipes;
 use crate::basic::Direction;
 use crate::basic::{get_earth_color, get_error_color, get_sky_color};
 
-pub struct App {
+pub struct Game {
     bird: Bird,
     pipes: Pipes,
     game_over: bool,
 }
 
-impl App {
+impl Game {
     pub fn new() -> Self {
-        App {
+        Game {
             bird: Bird::new(),
             pipes: Pipes::new(),
             game_over: false,
@@ -34,10 +33,6 @@ impl App {
         self.bird.direction(dir);
     }
 
-    pub fn bird_jump(&mut self) {
-        self.bird.direction(Some(Direction::Up));
-    }
-
     pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
         use graphics::*;
 
@@ -47,7 +42,7 @@ impl App {
         let earth_square = [
             0.0,
             (window_height - earth_height),
-            window_width,
+            earth_width,
             earth_height,
         ];
 
@@ -59,12 +54,11 @@ impl App {
             // rectangle(get_error_color(), [0.0, 211.0, window_width, 1.0], c.transform, g);
 
             rectangle(get_earth_color(), earth_square, c.transform, g);
-            self.pipes.draw(&c, g, window_size);
-            self.bird.draw(&c, g, window_size);
+            self.pipes.draw(&c, g);
+            self.bird.draw(&c, g);
 
-            let bird_square = self.bird.get_square(window_size);
+            let bird_square = self.bird.get_square();
             if self.pipes.is_hit(bird_square) {
-                // println!("HIT!!  bird: {:?}", bird_square);
                 self.game_over = true;
                 // process::exit(1);
             }
@@ -80,7 +74,8 @@ impl App {
         });
     }
 
-    pub fn update(&mut self, args: &UpdateArgs) {
+
+    pub fn update(&mut self, _args: &UpdateArgs) {
         if self.game_over == false {
             self.pipes.move_forward();
             self.bird.g_move();

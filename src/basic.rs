@@ -2,8 +2,6 @@
 pub enum Direction {
     Up,
     Down,
-    Left,
-    Right,
 }
 
 pub fn rgb_to_color(r: u16, g: u16, b: u16, opacity: f32) -> [f32; 4] {
@@ -19,13 +17,11 @@ pub fn rgbs_to_color(rgbs: [f32; 4]) -> [f32; 4] {
     [rgbs[0] / 255.0, rgbs[1] / 255.0, rgbs[2] / 255.0, rgbs[3]]
 }
 
-pub const SCREEN_WIDTH: f64 = 512.0;
-pub const SCREEN_HEIGHT: f64 = 512.0;
+pub const SCREEN_SIZE: (f64, f64) = (512.0, 512.0);
 
 pub const BIRD_SIZE: f64 = 30.0;
 
-pub const PIPE_WIDTH_MAX: f64 = 100.0;
-pub const PIPE_WIDTH_MIN: f64 = 80.0;
+pub const PIPE_WIDTH: f64 = 80.0;
 pub const PIPE_HEIGHT_MAX: f64 = 252.0;
 pub const PIPE_HEIGHT_MIN: f64 = 140.0;
 pub const PIPE_GAP_HEIGHT: f64 = 120.0;
@@ -53,9 +49,10 @@ pub fn get_error_color() -> [f32; 4] {
 }
 
 pub fn get_bird_square() -> [f64; 4] {
+    let (screen_width, screen_height) = SCREEN_SIZE;
     [
-        (SCREEN_WIDTH - BIRD_SIZE) / 2.0,
-        (SCREEN_HEIGHT - BIRD_SIZE) / 2.0,
+        (screen_width - BIRD_SIZE) / 2.0,
+        (screen_height - BIRD_SIZE) / 2.0,
         BIRD_SIZE,
         BIRD_SIZE,
     ]
